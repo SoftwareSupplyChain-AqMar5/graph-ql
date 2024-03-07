@@ -1,4 +1,42 @@
-- name: Manifest Generation
+name: CoSign an Image on LiveDemo
+on:
+  push:
+    branches:
+      - cosign
+jobs:
+  aqua:
+    name: Aqua scanner Trivy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@main
+      - name: Run Aqua scanner
+        uses: docker://aquasec/aqua-scanner
+        with:
+          args: trivy fs --security-checks config,vuln,secret . --sast
+          # To customize which severities to scan for, add the following flag: --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          # To enable SAST scanning, add: --sast
+          # To enable npm/dotnet non-lock file scanning, add: --package-json / --dotnet-proj
+          # Just to Rerun the WFs
+        env:
+          AQUA_KEY: ${{ secrets.AQUA_KEY }}
+          AQUA_SECRET: ${{ secrets.AQUA_SECRET }}
+          TRIVY_RUN_AS_PLUGIN: 'aqua'
+          #SAST: 1
+          TRIVY_DEBUG: 1
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: "stalibali/graphqlliveview:${{ github.sha }}"
+      - name: Manifest Generation
         run: |
           export BILLY_SERVER=https://billy.codesec.aquasec.com
           curl -sLo install.sh download.codesec.aquasec.com/billy/install.sh
