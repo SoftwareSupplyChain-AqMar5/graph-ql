@@ -1,11 +1,11 @@
-name: cosign an image
+name: CoSign an Image on LiveDemo
 on:
   push:
     branches:
       - cosign
 jobs:
   aqua:
-    name: Aqua scanner
+    name: Aqua scanner Trivy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -57,13 +57,13 @@ jobs:
               --access-token "${{ secrets.GITHUB_TOKEN }}" \
               --aqua-key "${{ secrets.AQUA_KEY }}" \
               --aqua-secret "${{ secrets.AQUA_SECRET }}" \
-              --artifact-path "stalibali/supplychainactionworkflow:${{ github.sha }}" \
+              --artifact-path "stalibali/graphqlliveview:${{ github.sha }}" \
               --report-format sbom \
               --sbom-path sbom.cdx.json
       - name: Attest SBOM
         run: cosign attest --key env://COSIGN_PRIVATE_KEY --type cyclonedx --predicate sbom.cdx.json ${TAGS} -y
         env:
-          TAGS: stalibali/supplychainactionworkflow:${{ github.sha }}
+          TAGS: stalibali/graphqlliveview:${{ github.sha }}
           COSIGN_PRIVATE_KEY: ${{secrets.COSIGN_KEY}}
           COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
       - name: Verify Docker SBOM Attestation
