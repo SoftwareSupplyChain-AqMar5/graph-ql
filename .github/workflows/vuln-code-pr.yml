@@ -2,7 +2,7 @@ name: Live Demo 14225
 on:
   push:
     branches:
-      - add-risky-code
+      - add-risky-code-1
 jobs:
   aqua:
     name: Supply Chain Security LiveDemo
