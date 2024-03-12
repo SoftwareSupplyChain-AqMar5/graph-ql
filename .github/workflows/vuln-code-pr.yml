@@ -1,8 +1,9 @@
-name: Live Demo 14225
+name: Main Branch LiveDemo 14225
 on:
   push:
     branches:
-      - add-risky-code-1
+      - main
+      - master
 jobs:
   aqua:
     name: Supply Chain Security LiveDemo
